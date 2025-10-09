@@ -20,3 +20,7 @@ def make_celery():
 
 
 celery_app = make_celery()
+
+
+celery_app.config_from_object("app.celery_utils.celery_app")
+celery_app.autodiscover_tasks(["app.tasks"])  # файл с celery задачами
