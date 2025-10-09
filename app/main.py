@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from uvicorn import run
 from app.tasks.counting import count_numbers
 from app.celery_utils import celery_app
+from app.tasks.unreliable import unreliable_task
 
 app = FastAPI()
 
@@ -15,6 +16,12 @@ def home():
 def run_count_task(n: int):
     """Запускаем задачу подсчёта чисел."""
     task = count_numbers.delay(n)  # отправляем в Celery
+    return {"task_id": task.id, "status": "Задача поставлена в очередь"}
+
+
+@app.post("/unreliable/{n}")
+def run_unreliable_task(n: int):
+    task = unreliable_task.delay(n)
     return {"task_id": task.id, "status": "Задача поставлена в очередь"}
 
 
