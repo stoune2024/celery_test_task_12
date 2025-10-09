@@ -1,4 +1,5 @@
 from celery import Celery
+from celery.schedules import crontab
 
 
 def make_celery():
@@ -14,6 +15,19 @@ def make_celery():
         accept_content=["json"],
         timezone="UTC",
         enable_utc=True,
+        beat_schedule={
+            "daily-report-cleanup-task": {
+                "task": "app.tasks.redis_cleanup.daily_report_cleanup",
+                "schedule": crontab(
+                    hour=8, day_of_week=1
+                ),  # Каждый понедельник в 8 утра
+            },
+            "daily-report-task": {
+                "task": "app.tasks.periodic.daily_report",
+                # "schedule": crontab(hour=9, minute=0),  # каждый день в 09:00 UTC
+                "schedule": crontab(minute="*/1"),  # Каждую минуту
+            },
+        },
     )
 
     return celery
