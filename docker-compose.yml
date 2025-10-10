@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  redis:
+    image: "redis:7"
+    container_name: "redis"
+    ports:
+      - "6379:6379"
+    networks:
+      - fastapi_celery_net
+
+  fastapi:
+    build: .
+    container_name: "fastapi"
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    networks:
+      - fastapi_celery_net
+
+  celery_worker:
+    build: .
+#    container_name: "celery_worker"
+    command: python worker.py
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    networks:
+      - fastapi_celery_net
+
+  celery_beat:
+    build: .
+    container_name: "celery_beat"
+    command: python beat.py
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    networks:
+      - fastapi_celery_net
+
+  flower:
+    image: mher/flower:0.9.7
+    container_name: "flower"
+    ports:
+      - "5555:5555"
+    command: flower --broker=redis://redis:6379/0
+    depends_on:
+      - redis
+      - celery_worker
+    networks:
+      - fastapi_celery_net
+
+networks:
+  fastapi_celery_net:

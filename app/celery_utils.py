@@ -4,8 +4,8 @@ from celery.schedules import crontab, Celery
 def make_celery():
     celery = Celery(
         "worker",
-        broker="redis://default:redis@localhost:6379/3",  # очередь задач
-        backend="redis://default:redis@localhost:6379/3",  # хранение результатов
+        broker="redis://redis:6379/0",  # очередь задач для Linux
+        backend="redis://redis:6379/0",  # хранение результатов для Linux
     )
 
     celery.conf.update(

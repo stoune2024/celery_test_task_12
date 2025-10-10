@@ -5,12 +5,12 @@ from redis import Redis
 @celery_app.task
 def daily_report_cleanup():
     r = Redis(
-        host="localhost",
+        host="redis",  # Для Docker Compose
         port=6379,
-        db=3,
-        password="redis",
+        db=0,
+        # password="redis",
         decode_responses=True,
-        username="default",
+        # username="default",
     )
     for key in r.scan_iter("celery-task-meta-*"):
         print(key)
