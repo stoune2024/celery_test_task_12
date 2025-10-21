@@ -26,9 +26,8 @@ def send_email(
     # Отправляем через сервер Яндекса
     try:
         with smtplib.SMTP_SSL(smtp_host, 465) as server:
-            server.starttls()  # Шифрование
             server.login(from_who, smtp_password_for_app)
             server.send_message(msg)
-            return {"message": "Письмо успешно отправлено!"}
+            return "Письмо успешно отправлено!"
     except Exception as e:
-        return {"Error": e}
+        return str(e)
